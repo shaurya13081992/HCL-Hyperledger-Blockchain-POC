@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="assets/css/bootstrap.min.css">
+    <style>
+        .bg{
+            background: #ccc;
+        }
+        .m10{
+            margin:10px;
+        }
+        .p10{
+            padding: 10px;
+        }
+
+        .border {
+            border: 1px solid grey;
+            border-radius: 5px;
+        }
+
+        .pad {
+            padding: 15px;
+            background:#fff;
+        }
+
+        </style>
+    </head>
+
+    <body>
+        <nav class="navbar navbar-expand-md navbar-dark bg-dark"></nav>
+        
+        <div class="container-fluid pad" style="background:#666"> 
+            <div class="col-sm-2" style="margin-left:-6px; margin-top:10px;" ><input type="text" value="Ledger" disabled></input></div>
+            <div id="myBlock" class="row parent-block">
+                <!-- left column -->                
+                <div class="col-md-3" id="child-block">
+                    <div class="bg m10 p10">
+                    <form class="needs-validation" novalidate>
+                        <div class="form-group">
+                            <label for="block">Block:</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <div class="input-group-text">#</div>
+                                </div>
+                                <input type="text" class="form-control blockId" id="blockId">
+                            </div>
+                        </div>                        
+                        <div class="form-group">
+                            <label for="data">Data:</label>
+                            <div id="data"></div>
+                        </div>
+                        <div class="form-group">
+                            <label>Prev:</label>
+                            <input type="text" class="form-control" id="prevHash" placeholder="0000000000" name="name">
+                        </div>
+                        <div class="form-group">
+                            <label>Hash:</label>
+                            <input type="text" class="form-control" id="hash" placeholder="be35" name="name">
+                        </div>
+                        <div class="form-group">
+                            <label>Status:</label>
+                            <input type="text" class="form-control" id="status" name="status" value="Approved">
+                        </div>
+                    </form>
+                </div>
+                </div>
+            </div>
+        </div>
+    </body>
+    <script src="assets/js/jquery-3.5.1.slim.min.js"></script>
+    <script src="assets/js/popper.min.js"></script>
+    <script src="assets/js/bootstrap.min.js"></script>
+    <script src="assets/js/blockchain.js"></script>
+    <script>
+    $(document).ready(function(){
+        $('.parent-block').show();
+        var prevHashCode='0000000000';
+        var events =['Actions','Shipment Created', 'Picked Up', 'Departed ',
+        'Delivered', 'POD (ERP Sysytem)'];
+        for(var i=1;i<=5;i++){
+            $('#child-block:first').clone().appendTo('.parent-block').prop('id', 'child-block' + i);
+            var event = events[i];//$("#action").val();
+            $('#child-block'+i).find('#blockId').val(i);
+            $('#child-block'+i).find('#prevHash').val(prevHashCode);
+            var hash = generateHash(event);
+            $('#child-block'+i).find('#hash').val(hash);
+            $('#child-block'+i).find('#data').append(getBlockDetails(event));
+            prevHashCode = hash;
+        }
+        $('#child-block').hide();
+        function generateHash(str){
+            var hash = 0;
+            if(str.length == 0){
+                return hash;
+            }
+            for(let i=0; i<str.length; i++){
+                var charCode = str.charCodeAt(i);
+                hash =((hash << 7) - hash) + charCode;
+                hash = hash & hash;
+            }
+            return hash;
+        }
+
+        function getBlockDetails(event){
+            /*if ($('#data > div').length > 1) {
+                $('#data > div').last().remove();
+            }*/
+            var date = new Date().toLocaleDateString() + " " +new Date().toLocaleTimeString();
+            return $('<div>').prop({
+                id: 'innerdiv',
+                innerHTML: 'ShipmentID : Test Shipment1<br>CustomerID : Test Customer1<br>'+
+                            'Status : ' +event+'<br> ShipmentNo : 4656656<br>'+
+                            'Latitude : 27.664827<br> Longitude : -81.515755 <br>'+  
+                            'Ship From : AC_DC01<br>Ship To: AC_CW03<br>Location : Test Location1<br> ' +
+                            'Date : '+date+'<br>Changed By : Test Person1<br>System : Test System1',
+                className: 'border pad'
+            });
+        }
+    });
+    </script>    
+</html>
